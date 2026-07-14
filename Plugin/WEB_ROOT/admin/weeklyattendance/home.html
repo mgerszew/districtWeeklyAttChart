@@ -1,0 +1,378 @@
+<!--
+TemplateName:Admin Page - District Weekly Attendance Chart
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>District Weekly Attendance Chart</title>
+    ~[wc:commonscripts]
+    <link href="/images/css/screen.css" rel="stylesheet" media="screen">
+    <link href="/images/css/print.css" rel="stylesheet" media="print">
+    <style>
+        .filter-panel { background: #f5f5f5; padding: 15px; margin-bottom: 20px; border-radius: 4px; }
+        .filter-row { display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; }
+        .filter-group { display: flex; flex-direction: column; min-width: 150px; }
+        .filter-group label { font-weight: bold; margin-bottom: 4px; font-size: 12px; }
+        .filter-group select { padding: 6px 8px; font-size: 13px; border: 1px solid #ccc; border-radius: 3px; }
+        .chart-container { width: 100%; height: 500px; margin-top: 20px; }
+        .summary-stats { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
+        .stat-box { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 15px 20px; min-width: 180px; }
+        .stat-box h4 { margin: 0 0 8px; font-size: 12px; color: #666; text-transform: uppercase; }
+        .stat-box .value { font-size: 24px; font-weight: bold; color: #333; }
+        .loading { text-align: center; padding: 40px; color: #666; }
+        .error { color: #cc0000; background: #ffeeee; border: 1px solid #cc0000; padding: 15px; border-radius: 4px; margin: 20px 0; }
+        .no-data { text-align: center; padding: 40px; color: #999; }
+    </style>
+</head>
+
+<!-- Page auto-registration -->
+~[if.~(f.table_info;table=pages;fn=count;dothisfor=all;*path=weeklyattendance/home.html)=0]
+    ~(f.table_sel;table=pages;fn=create_rec)
+    ~(f.field_set;name=[pages]path;value=weeklyattendance/home.html)
+    ~(f.field_set;name=[pages]security;value=000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000)
+    ~[f.table_sel;table=pages;fn=save_rec]
+    ~[f.table_sel;table=pages;fn=unload_rec]
+[/if]
+
+<body>
+    ~[wc:admin_header_frame_css]
+    <!-- breadcrumb start -->
+        <a href="/admin/home.html" target="_top">Start Page</a> > <a href="/admin/weeklyattendance/home.html" target="_top">District Weekly Attendance Chart</a>
+    <!-- breadcrumb end -->
+    ~[wc:admin_navigation_frame_css]
+    ~[wc:title_begin_css]District Weekly Attendance Chart~[wc:title_end_css]
+
+    <!-- AngularJS Bootstrap -->
+    <!-- production 
+    <div data-require-path="/admin/weeklyattendance/app/bootstrap.js?~[time]"
+         data-module-name="weeklyAttApp"
+         ng-cloak>
+    -->
+    <div data-module-name="weeklyAttApp"
+         ng-cloak>
+        <div ng-controller="WeeklyAttController as ctrl">
+            <div class="box-round" style="margin-top: 20px;">
+                <h2>District Weekly Attendance Trends</h2>
+                <p>View weekly average daily attendance percentages by school, filtered by grade level, gender, and school year.</p>
+
+                <!-- Filter Panel -->
+                <div class="filter-panel" ng-show="ctrl.dataLoaded">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label>School</label>
+                            <select ng-model="ctrl.filters.schoolId"
+                                    ng-options="s.id as s.name for s in ctrl.schools"
+                                    ng-change="ctrl.applyFilters()">
+                                <option value="">All Schools</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Grade Level</label>
+                            <select ng-model="ctrl.filters.gradeLevel"
+                                    ng-options="g for g in ctrl.gradeLevels"
+                                    ng-change="ctrl.applyFilters()">
+                                <option value="">All Grades</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Gender</label>
+                            <select ng-model="ctrl.filters.gender"
+                                    ng-options="g for g in ctrl.genders"
+                                    ng-change="ctrl.applyFilters()">
+                                <option value="">All Genders</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>School Year</label>
+                            <select ng-model="ctrl.filters.yearId"
+                                    ng-options="y for y in ctrl.yearIds"
+                                    ng-change="ctrl.applyFilters()">
+                                <option value="">All Years</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading/Error States -->
+                <div class="loading" ng-show="ctrl.loading">Loading attendance data...</div>
+                <div class="error" ng-show="ctrl.error">{{ ctrl.error }}</div>
+                <div class="no-data" ng-show="!ctrl.loading && !ctrl.error && ctrl.dataLoaded && ctrl.chartData.length === 0">No data available for selected filters</div>
+
+                <!-- Chart Container -->
+                <div class="chart-container" ng-show="ctrl.chartData.length > 0">
+                    <weekly-att-chart chart-data="ctrl.chartData" weeks="ctrl.weeks"></weekly-att-chart>
+                </div>
+
+                <!-- Summary Statistics -->
+                <div class="summary-stats" ng-show="ctrl.chartData.length > 0">
+                    <div class="stat-box" ng-repeat="series in ctrl.chartData">
+                        <h4>{{ series.seriesName }}</h4>
+                        <div class="value">{{ series.avgPct }}%</div>
+                        <div style="font-size: 11px; color: #888; margin-top: 4px;">
+                            Min: {{ series.minPct }}% | Max: {{ series.maxPct }}% | Weeks: {{ series.weekCount }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    ~[wc:admin_footer_frame_css]
+
+    <!-- Inline AngularJS Application -->
+    <script>
+        'use strict';
+
+        // Module Definition
+        angular.module('weeklyAttApp', ['powerSchoolModule']);
+
+        // Service: Data Loader
+        angular.module('weeklyAttApp').service('WeeklyAttDataService', ['$http', function($http) {
+            this.loadData = function() {
+                return $http({
+                    url: '/admin/weeklyattendance/data/weekly-attendance-data.json',
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+                }).then(function(response) {
+                    return response.data;
+                });
+            };
+        }]);
+
+        // Service: Chart Helper
+        angular.module('weeklyAttApp').service('WeeklyAttChartService', [function() {
+            this.computeSeriesStats = function(seriesData) {
+                var values = seriesData.filter(function(v) { return v !== null && v !== undefined; });
+                if (values.length === 0) return { avg: 0, min: 0, max: 0, count: 0 };
+                var sum = values.reduce(function(a, b) { return a + b; }, 0);
+                return {
+                    avg: Math.round(sum / values.length * 10) / 10,
+                    min: Math.min.apply(null, values),
+                    max: Math.max.apply(null, values),
+                    count: values.length
+                };
+            };
+
+            this.filterData = function(rawData, filters) {
+                return rawData.filter(function(item) {
+                    if (filters.schoolId && item.schoolId !== filters.schoolId) return false;
+                    if (filters.gradeLevel && item.gradeLevel !== filters.gradeLevel) return false;
+                    if (filters.gender && item.gender !== filters.gender) return false;
+                    if (filters.yearId && item.yearId !== filters.yearId) return false;
+                    return true;
+                });
+            };
+
+            this.buildChartData = function(filteredData, weeks) {
+                var chartSeries = [];
+                var seriesMap = {};
+
+                filteredData.forEach(function(item) {
+                    var key = item.schoolId + '|' + item.schoolName;
+                    if (!seriesMap[key]) {
+                        seriesMap[key] = {
+                            schoolId: item.schoolId,
+                            schoolName: item.schoolName,
+                            data: []
+                        };
+                    }
+                    seriesMap[key].data.push({
+                        grade: item.gradeLevel,
+                        gender: item.gender,
+                        year: item.yearId,
+                        weekly: item.weeklyPct
+                    });
+                });
+
+                Object.keys(seriesMap).forEach(function(key) {
+                    var series = seriesMap[key];
+                    var combinedWeekly = new Array(weeks.length).fill(0);
+                    var weekCounts = new Array(weeks.length).fill(0);
+
+                    series.data.forEach(function(d) {
+                        d.weekly.forEach(function(val, idx) {
+                            combinedWeekly[idx] += val;
+                            weekCounts[idx]++;
+                        });
+                    });
+
+                    var avgWeekly = combinedWeekly.map(function(sum, idx) {
+                        return weekCounts[idx] > 0 ? Math.round(sum / weekCounts[idx] * 10) / 10 : null;
+                    });
+
+                    var stats = this.computeSeriesStats(avgWeekly);
+
+                    chartSeries.push({
+                        seriesName: series.schoolName,
+                        data: avgWeekly,
+                        avgPct: stats.avg,
+                        minPct: stats.min,
+                        maxPct: stats.max,
+                        weekCount: stats.count
+                    });
+                }.bind(this));
+
+                return chartSeries;
+            };
+        }]);
+
+        // Controller
+        angular.module('weeklyAttApp').controller('WeeklyAttController', [
+            '$scope', '$q', 'WeeklyAttDataService', 'WeeklyAttChartService',
+            function($scope, $q, DataService, ChartService) {
+                var ctrl = this;
+
+                ctrl.loading = true;
+                ctrl.error = null;
+                ctrl.dataLoaded = false;
+                ctrl.rawData = [];
+                ctrl.chartData = [];
+                ctrl.weeks = [];
+                ctrl.schools = [];
+                ctrl.gradeLevels = [];
+                ctrl.genders = [];
+                ctrl.yearIds = [];
+
+                ctrl.filters = {
+                    schoolId: '',
+                    gradeLevel: '',
+                    gender: '',
+                    yearId: ''
+                };
+
+                // Initialize
+                DataService.loadData().then(function(data) {
+                    ctrl.rawData = data.attendanceData || [];
+                    ctrl.weeks = data.weeks || [];
+                    ctrl.schools = data.schools || [];
+                    ctrl.gradeLevels = data.gradeLevels || [];
+                    ctrl.genders = data.genders || [];
+                    ctrl.yearIds = data.yearIds || [];
+
+                    ctrl.applyFilters();
+                    ctrl.loading = false;
+                    ctrl.dataLoaded = true;
+                }).catch(function(err) {
+                    ctrl.loading = false;
+                    ctrl.error = 'Failed to load attendance data: ' + (err.message || err);
+                });
+
+                ctrl.applyFilters = function() {
+                    if (!ctrl.rawData.length) return;
+
+                    var filtered = ChartService.filterData(ctrl.rawData, ctrl.filters);
+                    ctrl.chartData = ChartService.buildChartData(filtered, ctrl.weeks);
+
+                    if (!$scope.$$phase) $scope.$apply();
+                };
+            }
+        ]);
+
+        // Directive: FusionCharts Wrapper
+        angular.module('weeklyAttApp').directive('weeklyAttChart', ['$q', function($q) {
+            return {
+                restrict: 'E',
+                scope: {
+                    chartData: '=',
+                    weeks: '='
+                },
+                template: '<div id="weekly-att-chart-container"></div>',
+                link: function(scope, element) {
+                    var chartInstance = null;
+                    var fusionChartsLoaded = false;
+
+                    function loadFusionCharts() {
+                        if (fusionChartsLoaded) return $q.resolve();
+
+                        return $q(function(resolve, reject) {
+                            require([
+                                'fusioncharts/fusioncharts',
+                                'fusioncharts/themes/fusioncharts.theme.fusion'
+                            ], function(FusionCharts) {
+                                FusionCharts.ready(function() {
+                                    fusionChartsLoaded = true;
+                                    resolve(FusionCharts);
+                                });
+                            }, function(err) {
+                                reject('Failed to load FusionCharts: ' + err);
+                            });
+                        });
+                    }
+
+                    function renderChart(FusionCharts) {
+                        if (chartInstance) {
+                            chartInstance.dispose();
+                        }
+
+                        var categories = [{ category: scope.weeks.map(function(w) { return { label: w }; }) }];
+
+                        var dataset = scope.chartData.map(function(series) {
+                            return {
+                                seriesName: series.seriesName,
+                                data: series.data.map(function(val) {
+                                    return val !== null ? { value: val } : { value: '' };
+                                })
+                            };
+                        });
+
+                        var chartConfig = {
+                            type: 'msline',
+                            renderAt: 'weekly-att-chart-container',
+                            width: '100%',
+                            height: '500',
+                            dataFormat: 'json',
+                            dataSource: {
+                                chart: {
+                                    caption: 'Weekly Average Daily Attendance %',
+                                    subCaption: 'By School',
+                                    xAxisName: 'Week',
+                                    yAxisName: 'Attendance %',
+                                    theme: 'fusion',
+                                    showValues: '0',
+                                    drawAnchors: '1',
+                                    anchorRadius: '3',
+                                    lineThickness: '2',
+                                    yAxisMinValue: '80',
+                                    yAxisMaxValue: '100',
+                                    toolTipColor: '#ffffff',
+                                    toolTipBorderThickness: '0',
+                                    toolTipBgColor: '#000000',
+                                    toolTipBgAlpha: '80',
+                                    toolTipBorderRadius: '2',
+                                    toolTipPadding: '5',
+                                    legendBorderAlpha: '0',
+                                    legendShadow: '0',
+                                    legendItemFontSize: '11',
+                                    legendItemFontColor: '#333333',
+                                    plotHighlightEffect: 'fadeout',
+                                    animation: '1'
+                                },
+                                categories: categories,
+                                dataset: dataset
+                            }
+                        };
+
+                        chartInstance = new FusionCharts(chartConfig);
+                        chartInstance.render();
+                    }
+
+                    scope.$watch('chartData', function(newData) {
+                        if (newData && newData.length > 0) {
+                            loadFusionCharts().then(renderChart).catch(function(err) {
+                                console.error(err);
+                                element.html('<div class="error">Chart rendering failed: ' + err + '</div>');
+                            });
+                        }
+                    }, true);
+
+                    scope.$on('$destroy', function() {
+                        if (chartInstance) {
+                            chartInstance.dispose();
+                        }
+                    });
+                }
+            };
+        }]);
+    </script>
+</body>
+</html>
