@@ -1,0 +1,126 @@
+<!-- tlist_sql Template for PowerSchool Admin Student Pages -->
+<!-- Copy into <div class="box-round"> before <div class="button-row"> -->
+
+<!-- ============================================
+     SIMPLE TABLE DISPLAY
+     ============================================ -->
+<div class="box-round">
+    <h2>[Section Title]</h2>
+    <table class="grid">
+        <thead>
+            <tr>
+                <th>Column 1</th>
+                <th>Column 2</th>
+                <th>Column 3</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            ~[tlist_sql:query_name]
+                WITH params AS (
+                    SELECT ~(curstudid) AS student_id, ~(curschoolid) AS school_id FROM dual
+                )
+                SELECT column1, column2, column3, id
+                FROM your_table y
+                JOIN params p ON y.studentid = p.student_id
+                WHERE y.schoolid = p.school_id
+                ORDER BY column1
+            [/tlist_sql]
+                <tr class="~[if.odd]odd[else]even[/if]">
+                    <td>~(column1)</td>
+                    <td>~(column2)</td>
+                    <td>~(column3)</td>
+                    <td class="actions">
+                        <a href="/~[self.page]?frn=~(studentfrn)&ac=upd&id=~(id)">Edit</a>
+                        <a href="/~[self.page]?frn=~(studentfrn)&ac=del&id=~(id)" onclick="return confirm('Delete?')">Delete</a>
+                    </td>
+                </tr>
+            ~[/tlist_sql]
+        </tbody>
+    </table>
+    
+    <div class="button-row">
+        <input type="hidden" name="ac" value="prim">
+        ~[submitbutton]
+    </div>
+</div>
+
+<!-- ============================================
+     WITH ADD BUTTON (for create-only pages)
+     ============================================ -->
+<div class="box-round">
+    <h2>[Section Title]</h2>
+    <p>[Description]</p>
+    
+    <div class="button-row" style="margin-bottom: 10px; text-align: right;">
+        <a href="/~[self.page]?frn=~(studentfrn)&ac=prim" class="btn btn-primary">Add New</a>
+    </div>
+    
+    <table class="grid">
+        <thead>
+            <tr><th>Name</th><th>Value</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+            ~[tlist_sql:records]
+                SELECT name, value, id
+                FROM your_table
+                WHERE studentid = ~(curstudid)
+                ORDER BY name
+            [/tlist_sql]
+                <tr class="~[if.odd]odd[else]even[/if]">
+                    <td>~(name)</td>
+                    <td>~(value)</td>
+                    <td>
+                        <a href="/~[self.page]?frn=~(studentfrn)&ac=upd&id=~(id)">Edit</a>
+                    </td>
+                </tr>
+            [else]
+                <tr><td colspan="3" class="center">No records</td></tr>
+            [/tlist_sql]
+        </tbody>
+    </table>
+</div>
+
+<!-- ============================================
+     PARAMETERIZED QUERY (GPV params)
+     ============================================ -->
+~[tlist_sql:attendance_report]
+    WITH params AS (
+        SELECT 
+            ~(curstudid) AS student_id,
+            ~(curschoolid) AS school_id,
+            TO_DATE(~(gpv.startdate), 'MM/DD/YYYY') AS start_date,
+            TO_DATE(~(gpv.enddate), 'MM/DD/YYYY') AS end_date
+        FROM dual
+    )
+    SELECT a.att_date, a.att_code, a.period_id
+    FROM attendance a
+    JOIN params p ON a.studentid = p.student_id
+    WHERE a.schoolid = p.school_id
+      AND a.att_date BETWEEN p.start_date AND p.end_date
+    ORDER BY a.att_date DESC, a.period_id
+[/tlist_sql]
+
+<!-- ============================================
+     NESTED DATA (student + related)
+     ============================================ -->
+<div class="box-round">
+    <h2>Student Contacts</h2>
+    ~[tlist_sql:contacts]
+        SELECT c.contact_name, c.relationship, c.phone, c.email, c.priority, c.id
+        FROM contacts c
+        WHERE c.studentid = ~(curstudid)
+        ORDER BY c.priority
+    [/tlist_sql]
+        <div class="contact-card">
+            <h3>~(contact_name)</h3>
+            <p><strong>Relationship:</strong> ~(relationship)</p>
+            <p><strong>Phone:</strong> ~(phone)</p>
+            <p><strong>Email:</strong> ~(email)</p>
+            <p><strong>Priority:</strong> ~(priority)</p>
+            <div class="actions">
+                <a href="/~[self.page]?frn=~(studentfrn)&ac=upd&id=~(id)">Edit</a>
+            </div>
+        </div>
+    ~[/tlist_sql]
+</div>

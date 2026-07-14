@@ -1,0 +1,11 @@
+<!-- /admin/{plugin}/templates/navigationSearch.html - External template for Hybrid pattern -->
+<!-- Referenced via: ng-include="'/admin/{plugin}/templates/navigationSearch.html'" -->
+
+<div class="plugin-navigation-search">
+    <select ng-model="selectReport" ng-change="switchReport(selectReport)" class="form-control">
+        <option value="">-- Select Report/Tool --</option>
+        <option ng-repeat="report in navItems"
+                ng-if="report.active === true"
+                value="{{ report.url }}">{{ report.name }}</option>
+    </select>
+</div>

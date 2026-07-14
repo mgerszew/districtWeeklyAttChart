@@ -1,0 +1,456 @@
+<queries>
+    <query name="org.bps.sbgassign.standardscore.sbgassignscore" coreTable="" flattened="true">
+        <description>Assignments by studentdcid, standardid, and sectiondcid</description>
+        <args>
+			<arg name="curstudid" required="false" description="Current Student ID" type="primitive" default="~(curstudid)" />
+        </args>
+        <columns>
+			<column column="Students.dcid">StudentDCID</column>
+			<column column="Students.id">StudentID</column>
+			<column column="assignmentsection.sectionsdcid">SectionsDCID</column>
+			<column column="standard.standardid">StandardID</column>
+			<column column="assignmentsection.duedate">DueDate</column>
+			<column column="assignmentsection.assignmentsectionid">AssignmentSectionID</column>
+			<column column="assignmentsection.duedate">DueDateText</column>
+			<column column="standard.identifier">Identifier</column>
+			<column column="teachercategory.name">Category</column>
+			<column column="assignmentsection.name">AssignmentName</column>
+			<column column="assignmentsection.description">Description</column>
+			<column column="standardscore.actualscoreentered">AssignmentScore</column>
+			<column column="terms.yearid">Yearid</column>
+			<column column="standardscore.iscollected">Collected</column>
+			<column column="standardscore.isexempt">StandardExempt</column>
+ 		</columns>
+        <sql>
+		<![CDATA[
+		select 
+		s.dcid "StudentDCID"
+		,s.id "StudentID"
+		,s_sm.SECTIONSDCID "SectionsDCID"
+		, st.standardid "StandardID"
+		, psm_sa.dateassignmentdue "DueDate"
+		, psm_sa.id "AssignmentID"
+		,to_char(psm_sa.DATEASSIGNMENTDUE,'MM/DD/YYYY') "DueDateTxt"
+		,st.identifier "Identifier"
+		,psm_ac.Name "Category"
+		,psm_a.name "AssignmentName"
+		,psm_a.description "Description"
+		,psm_ascore.ACTUALSCOREENTERED "AssignmentScore"
+		, t.YEARID "Yearid"
+		, psm_ascore.turnedin "Collected"
+		, psm_ascore.exempt "StandardExempt"
+
+		from psm_reportcarditem psm_rci
+		inner join PSM_REPORTCARDITEMGRADE psm_rcig
+			on psm_rci.id = psm_rcig.REPORTCARDITEMID
+		inner join PSM_REPORTINGTERM psm_rt
+			on psm_rci.REPORTINGTERMID = psm_rt.id
+		inner join sync_termmap sync_t
+			on psm_rt.TERMID = sync_t.termid
+		inner join terms t
+			on sync_t.termsdcid = t.dcid
+		inner join sync_sectionenrollmentmap s_sem
+			on s_sem.sectionenrollmentid = psm_rcig.SECTIONENROLLMENTID
+		inner join cc
+			on s_sem.ccdcid = cc.dcid
+		inner join students s
+			on cc.studentid = s.id
+		inner join psm_standard psm_st
+			on psm_st.id = psm_rci.STANDARDID
+		inner join sync_standardmap sstm
+			on sstm.standardid = psm_st.ID
+		inner join standard st
+			on sstm.STANDARDSDCID = st.LONGITUDINALID
+		inner join sync_sectionmap s_sm
+			on s_sm.sectionid = psm_rci.SECTIONID
+		inner join psm_assignmentstandard psm_as
+			on psm_as.standardid = psm_rci.standardid
+		inner join psm_assignmentstandardscore psm_ascore
+			on psm_ascore.assignmentstandardid = psm_as.id
+			and psm_ascore.sectionenrollmentid = psm_rcig.sectionenrollmentid
+		inner join PSM_SECTIONASSIGNMENT psm_sa
+			on psm_as.SECTIONASSIGNMENTID = psm_sa.ID
+		inner join PSM_ASSIGNMENT psm_a
+			on psm_sa.ASSIGNMENTID = psm_a.ID
+		inner join PSM_ASSIGNMENTCATEGORY psm_ac
+			on psm_a.ASSIGNMENTCATEGORYID = psm_ac.id
+		where
+		s.id = :curstudid
+
+		union
+
+		select 
+		s.dcid
+		,s.id
+		,ase.SECTIONSDCID
+		, st.standardid
+		, ase.duedate
+		, ase.assignmentsectionid
+		,to_char(ase.DUEDATE,'MM/DD/YYYY') "DueDate"
+		,st.identifier
+		,nvl(tc.NAME, dtc.name) "Category"
+		,ase.name "AssignName"
+		,ase.DESCRIPTION "Description"
+		,ss.ACTUALSCOREENTERED "StandardScore"
+		, t.YEARID "YearID"
+		, ss.iscollected
+		, case when asa.ISCOUNTEDINSTANDARDGRADE = 0 or ss.isexempt = 1 then 1 else 0 end
+
+		from standardscore ss
+		inner join students s
+			on ss.STUDENTSDCID = s.DCID
+		inner join assignmentsection ase
+			on ss.ASSIGNMENTSECTIONID = ase.ASSIGNMENTSECTIONID
+		inner join assignmentstandardassoc asa
+			on ss.ASSIGNMENTSTANDARDASSOCID = asa.ASSIGNMENTSTANDARDASSOCID
+		inner join standard st
+			on asa.STANDARDID = st.STANDARDID
+		inner join ASSIGNMENTCATEGORYASSOC aca
+			on aca.ASSIGNMENTSECTIONID = ase.ASSIGNMENTSECTIONID
+		inner join Assignment asg
+			on ase.ASSIGNMENTID = asg.ASSIGNMENTID
+		inner join TEACHERCATEGORY tc
+			on tc.TEACHERCATEGORYID = aca.TEACHERCATEGORYID
+		inner join sections se
+			on ase.SECTIONSDCID = se.dcid
+		inner join terms t
+			on se.termid = t.ID
+			and se.schoolid = t.SCHOOLID
+		left join districtteachercategory dtc
+			on tc.DISTRICTTEACHERCATEGORYID = dtc.districtteachercategoryid
+
+		where 
+		s.id = :curstudid
+		order by 3,4,5 desc		
+		]]>
+        </sql>
+    </query>	
+	
+	<query name="org.bps.sbgassign.sections.calcmethod" coreTable="" flattened="true">
+        <description>Assignments by studentdcid, standardid, and sectiondcid</description>
+        <args>
+			<arg name="curstudid" required="false" description="Current Student ID" type="primitive" default="~(curstudid)" />
+        </args>
+        <columns>
+			<column column="Students.dcid">StudentDCID</column>
+			<column column="Students.id">StudentID</column>
+			<column column="Sections.dcid">SectionsDCID</column>
+			<column column="GradeSchoolConfig.RECENTSCOREWEIGHTLIST">Weight</column>
+			<column column="GradeSchoolConfig.CALCULATIONMETRIC">CalcMethod</column>
+			<column column="GradeCalculationType.StoreCode">Term</column>
+			<column column="TermBins.date1">TermStart</column>
+			<column column="TermBins.date2">TermEnd</column>
+ 		</columns>
+        <sql>
+		<![CDATA[
+		select 
+		s.dcid "StudentsDCID"
+		, s.id "StudentID"
+		,se.dcid "SectionsDCID"
+		,psm_ssc.RECENCYSETUP "Weight"
+		,case psm_ssc.calculationtype
+			when 0 then 'Average'
+			when 1 then 'Median'
+			when 2 then 'Mode'
+			when 3 then 'Highest'
+			when 4 then 'Most Recent'
+			when 5 then 'None'
+		end "CalcMethod"
+		,psm_rt.NAME "Term"
+		,psm_rt.startdate "TermStart"
+		,psm_rt.ENDDATE "TermEnd"
+
+		from 
+		students s
+		inner join cc
+			on s.id = cc.studentid
+		inner join sections se
+			on cc.SECTIONID = se.ID
+		inner join sync_sectionmap s_sm
+			on s_sm.SECTIONSDCID = se.DCID
+		inner join psm_sectionstandardcalc psm_ssc
+			on s_sm.SECTIONID = psm_ssc.SECTIONID
+		inner join psm_reportingterm psm_rt
+			on psm_rt.id = psm_ssc.REPORTINGTERMID
+		where
+		s.id = :curstudid
+
+		union
+
+		select
+		s.dcid
+		, s.id
+		, se.dcid
+		, nvl(gse.RECENTSCOREWEIGHTLIST, gsc.RECENTSCOREWEIGHTLIST)
+		, replace(nvl(gse.STNDCALCULATIONMETRIC, gsc.CALCULATIONMETRIC), '_', ' ')
+		, nvl(gct.storecode, tb.STORECODE)
+		, nvl(tbsc.date1, tb.date1)
+		, nvl(tbsc.date2, tb.date2)
+		from
+		students s
+		inner join cc
+			on s.id = cc.STUDENTID
+		inner join sections se
+			on cc.SECTIONID = se.id
+		inner join terms t
+			on se.TERMID = t.id
+			and se.SCHOOLID = t.SCHOOLID
+		inner join schools sc
+			on sc.SCHOOL_NUMBER = se.SCHOOLID
+		left join gradesectionconfig gse
+			on gse.SECTIONSDCID = se.DCID
+		left join GRADESCHOOLCONFIG gsc
+			on gsc.SCHOOLSDCID = sc.DCID
+		left join gradeformulaset gfs
+			on gfs.SECTIONSDCID = se.DCID
+			and gfs.YEARID = t.YEARID
+		left join GRADECALCULATIONTYPE gct
+			on gct.GRADEFORMULASETID = gfs.GRADEFORMULASETID
+			and gct.YEARID = gfs.YEARID
+		left join termbins tb
+			on se.SCHOOLID = tb.SCHOOLID
+			and t.YEARID = tb.YEARID
+			and tb.termid = tb.yearid * 100
+		left join termbins tbsc
+			on se.SCHOOLID = tbsc.SCHOOLID
+			and t.YEARID = tbsc.YEARID
+			and tb.termid = tbsc.yearid * 100
+			and gct.STORECODE = tb.STORECODE
+
+		where
+		s.id = :curstudid
+		order by 2,5
+		]]>
+        </sql>
+    </query>
+    <query name="org.bps.sbgassign.standardscore.sbgassignscoretrend" coreTable="" flattened="true">
+        <description>Score trend by studentdcid, standardid, and sectiondcid</description>
+        <args>
+			<arg name="curstudid" required="false" description="Current Student ID" type="primitive" default="~(curstudid)" />
+        </args>
+        <columns>
+			<column column="Students.dcid">StudentDCID</column>
+			<column column="Students.id">StudentID</column>
+			<column column="assignmentsection.sectionsdcid">SectionsDCID</column>
+			<column column="standard.standardid">StandardID</column>
+			<column column="terms.yearid">Yearid</column>
+			<column column="assignmentsection.duedate">ScoreCount</column>
+			<column column="standardscore.isexempt">ExemptCount</column>			
+			<column column="standardscore.isexempt">NonExemptCount</column>			
+			<column column="standardscore.actualscoreentered">ScoreSlope</column>
+			<column column="standardscore.actualscoreentered">ScoreSlopeNoExempt</column>
+ 		</columns>
+        <sql>
+		<![CDATA[
+		with assignDetail as(
+			select 
+			s.dcid StudentDCID
+			,s.id StudentID
+			,s_sm.SECTIONSDCID SectionsDCID
+			, st.standardid StandardID
+			, psm_sa.dateassignmentdue DueDate
+			,psm_ascore.ACTUALSCOREENTERED AssignmentScore
+			, psm_ascore.score ConvertedScore
+			, t.YEARID Yearid
+			, psm_ascore.exempt StandardExempt
+			from psm_reportcarditem psm_rci
+			inner join PSM_REPORTCARDITEMGRADE psm_rcig
+				on psm_rci.id = psm_rcig.REPORTCARDITEMID
+			inner join PSM_REPORTINGTERM psm_rt
+				on psm_rci.REPORTINGTERMID = psm_rt.id
+			inner join sync_termmap sync_t
+				on psm_rt.TERMID = sync_t.termid
+			inner join terms t
+				on sync_t.termsdcid = t.dcid
+			inner join sync_sectionenrollmentmap s_sem
+				on s_sem.sectionenrollmentid = psm_rcig.SECTIONENROLLMENTID
+			inner join cc
+				on s_sem.ccdcid = cc.dcid
+			inner join students s
+				on cc.studentid = s.id
+			inner join psm_standard psm_st
+				on psm_st.id = psm_rci.STANDARDID
+			inner join sync_standardmap sstm
+				on sstm.standardid = psm_st.ID
+			inner join standard st
+				on sstm.STANDARDSDCID = st.LONGITUDINALID
+				and st.yearid = t.yearid
+			inner join sync_sectionmap s_sm
+				on s_sm.sectionid = psm_rci.SECTIONID
+			inner join psm_assignmentstandard psm_as
+				on psm_as.standardid = psm_rci.standardid
+			inner join psm_assignmentstandardscore psm_ascore
+				on psm_ascore.assignmentstandardid = psm_as.id
+				and psm_ascore.sectionenrollmentid = psm_rcig.sectionenrollmentid
+			inner join PSM_SECTIONASSIGNMENT psm_sa
+				on psm_as.SECTIONASSIGNMENTID = psm_sa.ID
+			inner join PSM_ASSIGNMENT psm_a
+				on psm_sa.ASSIGNMENTID = psm_a.ID
+			inner join PSM_ASSIGNMENTCATEGORY psm_ac
+				on psm_a.ASSIGNMENTCATEGORYID = psm_ac.id
+			where
+			s.id = :curstudid
+
+			union
+
+			select 
+			s.dcid
+			,s.id
+			,ase.SECTIONSDCID
+			, st.standardid
+			, ase.duedate
+			,ss.ACTUALSCOREENTERED
+			, ss.ScorePercent
+			, t.YEARID
+			, case when asa.ISCOUNTEDINSTANDARDGRADE = 0 or ss.isexempt = 1 then 1 else 0 end
+			from standardscore ss
+			inner join students s
+				on ss.STUDENTSDCID = s.DCID
+			inner join assignmentsection ase
+				on ss.ASSIGNMENTSECTIONID = ase.ASSIGNMENTSECTIONID
+			inner join assignmentstandardassoc asa
+				on ss.ASSIGNMENTSTANDARDASSOCID = asa.ASSIGNMENTSTANDARDASSOCID
+			inner join standard st
+				on asa.STANDARDID = st.STANDARDID
+			inner join ASSIGNMENTCATEGORYASSOC aca
+				on aca.ASSIGNMENTSECTIONID = ase.ASSIGNMENTSECTIONID
+			inner join Assignment asg
+				on ase.ASSIGNMENTID = asg.ASSIGNMENTID
+			inner join TEACHERCATEGORY tc
+				on tc.TEACHERCATEGORYID = aca.TEACHERCATEGORYID
+			inner join sections se
+				on ase.SECTIONSDCID = se.dcid
+			inner join terms t
+				on se.termid = t.ID
+				and se.schoolid = t.SCHOOLID
+
+			where 
+			s.id = :curstudid
+		),
+		scoreByN as(
+			select 
+			StudentDCID
+			, StudentID
+			, SectionsDCID
+			, StandardID
+			, YearID
+			, DueDate
+			, row_number() over (partition by YearID, StudentDCID, SectionsDCID, StandardID order by YearID, StudentDCID, SectionsDCID, StandardID, DueDate) as rNumber
+			, case when LENGTH(TRIM(TRANSLATE(AssignmentScore, ' +-.0123456789', ' '))) is null then AssignmentScore
+				else to_char(ConvertedScore) end AssignmentScore -- use the assignment score if it looks like a number, otherwise use the converted score (Grade Value from Grade Scale)
+			, StandardExempt
+			from assignDetail
+			where AssignmentScore is not null
+			and (LENGTH(TRIM(TRANSLATE(AssignmentScore, ' +-.0123456789', ' '))) is null
+					or (LENGTH(TRIM(TRANSLATE(AssignmentScore, ' +-.0123456789', ' '))) is not null and ConvertedScore is not null)
+				)
+		),
+		slopeAll as(
+			select
+			StudentDCID
+			, StudentID
+			, SectionsDCID
+			, StandardID
+			, YearID
+			, count(DueDate) scoreCount
+			, sum(StandardExempt) exemptCount
+			, case when count(DueDate) > 1 then round(regr_slope(AssignmentScore, rNumber), 1)
+				else 0 end scoreSlope
+			from scoreByN
+			group by YearID, StudentDCID, StudentID, SectionsDCID, StandardID
+		),
+		slopeNoExempt as(
+		select
+		StudentDCID
+		, StudentID
+		, SectionsDCID
+		, StandardID
+		, YearID
+		, count(DueDate) scoreCount
+		, case when count(DueDate) = sum(StandardExempt) then 0 -- if all scores are exempt, don't produce any slope
+			when count(DueDate) > 1 then round(regr_slope(AssignmentScore, rNumber), 1)
+			else 0 end scoreSlopeNoExempt
+		from scoreByN
+		where StandardExempt != 1
+		group by YearID, StudentDCID, StudentID, SectionsDCID, StandardID
+
+		)
+
+		select
+		sa.StudentDCID StudentDCID
+		, sa.StudentID StudentID
+		, sa.SectionsDCID SectionsDCID
+		, sa.StandardID StandardID
+		, sa.YearID YearID
+		, sa.scoreCount scoreCount
+		, sa.exemptCount exemptCount
+		, nvl(sne.scoreCount, 0) nonExemptCount
+		, sa.scoreSlope scoreSlope
+		, nvl(sne.scoreSlopeNoExempt, 0) scoreSlopeNoExempt
+		from slopeAll sa
+			left join slopeNoExempt sne
+			on sa.studentdcid = sne.studentdcid
+			and sa.sectionsdcid = sne.sectionsdcid
+			and sa.standardid = sne.standardid
+			and sa.yearid = sne.yearid
+		order by 5,1,2,3,4
+		]]>
+        </sql>
+    </query>
+	<query name="org.bps.sbgassign.standardgradesection.sbgscoreterms" coreTable="" flattened="true">
+        <description>Score trend by studentdcid, standardid, and sectiondcid</description>
+        <args>
+			<arg name="curstudid" required="false" description="Current Student ID" type="primitive" default="~(curstudid)" />
+        </args>
+        <columns>
+			<column column="StandardGradeSection.yearid">Yearid</column>
+			<column column="StandardGradeSection.StudentsDCID">StudentDCID</column>
+			<column column="StandardGradeSection.StandardID">StandardID</column>
+			<column column="StandardGradeSection.sectionsdcid">SectionsDCID</column>
+			<column column="StandardGradeSection.StoreCode">StoreCode</column>
+			<column column="Terms.FirstDay">StartDate</column>
+			<column column="Terms.LastDay">EndDate</column>
+ 		</columns>
+        <sql>
+		<![CDATA[		
+		select
+			sgs.yearid
+			, sgs.STUDENTSDCID
+			, sgs.standardid
+			, sgs.sectionsdcid
+			, sgs.storecode
+			, to_char(t.firstday, 'yyyy-mm-dd') StartDate
+			, to_char(t.lastday, 'yyyy-mm-dd') EndDate
+			from
+			standardgradesection sgs
+			inner join schools sc
+				on sgs.SCHOOLSDCID=sc.DCID
+			inner join terms t
+				on sc.school_number = t.SCHOOLID
+				and sgs.yearid = t.yearid
+				and sgs.storecode = case when t.isyearrec=1 then 'Y1' else t.ABBREVIATION end
+			inner join students s
+				on sgs.STUDENTSDCID = s.dcid
+		where 
+		s.id = :curstudid
+		order by sgs.standardid, t.id
+		]]>
+        </sql>
+    </query>
+	<query name="org.bps.sbgassign.district.settings" coreTable="" flattened="true">
+        <description>Settings for SBG Assignment View</description>
+        <args>
+        </args>
+        <columns>
+			<column column="Gen.dcid">dcid</column>
+			<column column="Gen.id">id</column>
+			<column column="Gen.cat">cat</column>
+			<column column="Gen.value">excludeExempt</column>
+ 		</columns>
+        <sql>
+		<![CDATA[		
+		SELECT dcid, id, cat, value from gen where cat='sbgassignview'
+		]]>
+        </sql>
+    </query>		
+</queries>			

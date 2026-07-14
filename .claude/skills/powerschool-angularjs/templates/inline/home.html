@@ -1,0 +1,123 @@
+<!-- /admin/{plugin}/home.html - Fully Inline Prototype (Pattern A) -->
+<!-- Replace {plugin} with your plugin folder name (e.g., myPlugin) -->
+<!-- Replace {Plugin Name} with display name (e.g., My Plugin) -->
+
+<head>
+    <title>{Plugin Name}</title>
+    ~[wc:commonscripts]
+    <link href="/images/css/screen.css" rel="stylesheet" media="screen">
+    <link href="/images/css/print.css" rel="stylesheet" media="print">
+</head>
+
+<!-- Page auto-registration (PowerSchool TCL) -->
+~[if.~(f.table_info;table=pages;fn=count;dothisfor=all;*path={plugin}/home.html)=0]
+    ~(f.table_sel;table=pages;fn=create_rec)
+    ~(f.field_set;name=[pages]path;value={plugin}/home.html)
+    ~(f.field_set;name=[pages]security;value={SECURITY_BITMASK})
+    ~[f.table_sel;table=pages;fn=save_rec]
+    ~[f.table_sel;table=pages;fn=unload_rec]
+[/if]
+
+<body>
+    ~[wc:admin_header_css]
+    <!-- breadcrumb start -->{Plugin Name}<!-- breadcrumb end -->
+    ~[wc:admin_navigation_css]
+    <h1>{Plugin Name}</h1>
+
+    <!-- Bootstrap: data-module-name REQUIRED. data-require-path MAY be required. -->
+    <div data-require-path="/admin/{plugin}/app/bootstrap.js?~[time]"
+         data-module-name="{plugin}App" ng-cloak>
+        <div ng-controller="{plugin}Controller">
+            <{plugin}-navigation></{plugin}-navigation>
+            <{plugin}-navigation-search></{plugin}-navigation-search>
+        </div>
+    </div>
+
+    <!-- Inline Templates (ng-template) -->
+    <script type="text/ng-template" id="navigation.html">
+        <nav>
+            <ul>
+                <li ng-repeat="item in navItems"><a ng-href="{{item.url}}">{{item.name}}</a></li>
+            </ul>
+        </nav>
+    </script>
+
+    <script type="text/ng-template" id="navigationSearch.html">
+        <select ng-model="selectReport" ng-change="switchReport(selectReport)">
+            <option ng-repeat="report in navItems"
+                    ng-if="report.active === true"
+                    value="{{ report.url }}">{{ report.name }}</option>
+        </select>
+    </script>
+
+    <!-- Inline AngularJS Application -->
+    <script>
+        'use strict';
+
+        // Module definition (no AMD wrapper)
+        angular.module('{plugin}App', ['powerSchoolModule']);
+
+        // Controller
+        angular.module('{plugin}App').controller('{plugin}Controller',
+            ['$scope', '$http', '$compile', '{plugin}General', '{plugin}Unique',
+            function ($scope, $http, $compile, general, unique) {
+                $scope.navItems = [];
+                $scope.switchReport = function(report) { window.location.href = report; };
+
+                $http({
+                    url: '/admin/{plugin}/data/plugins.json',
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+                }).then(function (response) {
+                    $scope.navItems = response.data.reports.concat(response.data.tools);
+                });
+            }]);
+
+        // Services
+        angular.module('{plugin}App').service('{plugin}General', function() {
+            this.ampHandler = function(a) { /* Ampersand handler */ };
+            this.dateHandlerNG = function(dts) { /* Date handler */ };
+            this.sortMap = function(arr, key) { return arr.sort(function(a,b){ return (a[key] > b[key]) ? 1 : -1; }); };
+            this.makeMap = function(arr, key) {
+                var map = {}; angular.forEach(arr, function(item){ map[item[key]] = true; }); return map;
+            };
+        });
+
+        angular.module('{plugin}App').service('{plugin}Unique', function() {
+            this.simpleObjArray = function(primeArray, keyname) {
+                var output = [], keys = [];
+                angular.forEach(primeArray, function(item) {
+                    var key = item[keyname];
+                    if (keys.indexOf(key) === -1) { keys.push(key); output.push(item); }
+                });
+                return output;
+            };
+        });
+
+        // Directives
+        angular.module('{plugin}App').directive('{plugin}Navigation', ['$http', '$compile',
+            function ($http, $compile) {
+                return {
+                    restrict: 'E',
+                    template: '<div ng-include="\'navigation.html\'"></div>',
+                    link: function (scope) {
+                        // Link logic if needed
+                    }
+                };
+            }]);
+
+        angular.module('{plugin}App').directive('{plugin}NavigationSearch', ['$http', '$compile',
+            function ($http, $compile) {
+                return {
+                    restrict: 'E',
+                    template: '<div ng-include="\'navigationSearch.html\'"></div>',
+                    controller: ['$http', '$scope', function($http, $scope) {
+                        $scope.switchReport = function(report) { window.location.href = report; };
+                    }],
+                    controllerAs: 'navCtrl'
+                };
+            }]);
+    </script>
+
+    ~[wc:admin_footer_css]
+</body>

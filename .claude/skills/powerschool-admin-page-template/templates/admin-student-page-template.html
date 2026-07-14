@@ -1,0 +1,46 @@
+<!--
+TemplateName:Admin Student Page - [Page Name]
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>[Page Title]</title>
+    ~[wc:commonscripts]
+    <link href="/images/css/screen.css" rel="stylesheet" media="screen">
+    <link href="/images/css/print.css" rel="stylesheet" media="print">
+</head>
+<body>
+    ~[wc:admin_header_frame_css]
+    <!-- breadcrumb start -->
+        <a href="/admin/home.html" target="_top">Start Page</a> > <a href="/admin/students/home.html?selectstudent=nosearch" target="_top">Student Selection</a> > [Page Title]
+    <!-- breadcrumb end -->
+    ~[wc:admin_navigation_frame_css]
+    ~[wc:title_student_begin_css][Page Title]~[wc:title_student_end_css]
+    <form action="/~[self.page]?frn=~(studentfrn)&changesSaved=true" method="POST">
+    <!-- start of content area -->
+    ~[if.~(gpv.changesSaved)=true]<div class="feedback-confirm">~[text:psx.common.changes_recorded]</div>[/if]
+        <div class="box-round">
+            <h2>[Section Heading]</h2>
+            <p>[Page content description]</p>
+            
+            <!-- FORM FIELDS GO HERE -->
+            <!-- Example: -->
+            <!--
+            <table class="grid">
+                <tr>
+                    <th><label for="field_name">Field Label</label></th>
+                    <td><input type="text" name="field_name" id="field_name" value="~(field_name)"></td>
+                </tr>
+            </table>
+            -->
+            
+            <div class="button-row">
+                <input type="hidden" name="ac" value="prim">
+                ~[submitbutton]
+            </div>
+        </div>
+    </form>
+    <!-- end of content area -->
+    ~[wc:admin_footer_frame_css]
+</body>
+</html>

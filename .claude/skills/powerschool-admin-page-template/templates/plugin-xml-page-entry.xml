@@ -1,0 +1,15 @@
+<!-- plugin.xml Page & Permission Entry Template -->
+
+<!-- ============================================
+     FULL plugin.xml STRUCTURE REFERENCE
+     ============================================ -->
+<plugin>
+    <publisher>
+        <name>Your District</name>
+        <contact>admin@district.edu</contact>
+    </publisher>
+    <pluginname>custom_student_pages</pluginname>
+    <description>Custom Admin Portal Student Pages</description>
+    <version>1.0.0</version>
+
+</plugin>

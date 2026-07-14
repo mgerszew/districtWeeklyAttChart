@@ -1,0 +1,302 @@
+{
+  "alert": {
+    "body": "alert(\"$1\");$0",
+    "prefix": "alert"
+  },
+  "chrCaret": {
+    "body": "CHR(94)$0",
+    "prefix": "chrCaret"
+  },
+  "chrCarriageReturn": {
+    "body": "CHR(13)$0",
+    "prefix": "chrCarriageReturn"
+  },
+  "chrColon": {
+    "body": "CHR(58)$0",
+    "prefix": "chrColon"
+  },
+  "chrLeftBracket": {
+    "body": "CHR(91)$0",
+    "prefix": "chrLeftBracket"
+  },
+  "chrLineFeed": {
+    "body": "CHR(10)$0",
+    "prefix": "chrLineFeed"
+  },
+  "chrRightBracket": {
+    "body": "CHR(93)$0",
+    "prefix": "chrRightBracket"
+  },
+  "consoleLog": {
+    "body": "console.log(\"$1\");$0",
+    "prefix": "consoleLog"
+  },
+  "ifJavaScript": {
+    "body": "if(${1:something} == ${2:something}){\n\t$3\n}$0",
+    "prefix": "ifJavaScript"
+  },
+  "jqAddClass": {
+    "body": "\\$j('#${1:slector}').addClass($2);$0",
+    "prefix": "jqAddClass"
+  },
+  "jqAjaxStop": {
+    "body": "\\$j(document).ajaxStop(function(){\n\t$1\n});$0",
+    "prefix": "jqAjaxStop"
+  },
+  "jqAppend": {
+    "body": "\\$j('#${1:slector}').append($2);$0",
+    "prefix": "jqAppend"
+  },
+  "jqAttr": {
+    "body": "\\$j('#${1:slector}').attr('${2:attr}','${3:value}');$0",
+    "prefix": "jqAttr"
+  },
+  "jqChange": {
+    "body": "\\$j('#${1:slector}').change(function(){\n\t$2\n});$0",
+    "prefix": "jqChange"
+  },
+  "jqClosest": {
+    "body": "\\$j('#${1:slector}').closest($2);$0",
+    "prefix": "jqClosest"
+  },
+  "jqEach": {
+    "body": "\\$j('#${1:slector}').each(function(){\n\t$2\n});$0",
+    "prefix": "jqEach"
+  },
+  "jqFind": {
+    "body": "\\$j('#${1:slector}').find($2);$0",
+    "prefix": "jqFind"
+  },
+  "jqGetJson": {
+    "body": "\\$j.getJSON(${1:url},function(data){\n\t$2\n});$0",
+    "prefix": "jqGetJson"
+  },
+  "jqHide": {
+    "body": "\\$j('#${1:slector}').hide();$0",
+    "prefix": "jqHide"
+  },
+  "jqHtml": {
+    "body": "\\$j('#${1:slector}').html($2);$0",
+    "prefix": "jqHtml"
+  },
+  "jqOn": {
+    "body": "\\$j('#${1:slector}').on('${2:event}',function(){\n\t$2\n});$0",
+    "prefix": "jqOn"
+  },
+  "jqPost": {
+    "body": "\\$j.post(${1:url},function(data){\n\t$2\n});$0",
+    "prefix": "jqPost"
+  },
+  "jqReady": {
+    "body": "\\$j(document).ready(function(){\n\t$1\n});$0",
+    "prefix": "jqReady"
+  },
+  "jqRemoveClass": {
+    "body": "\\$j('#${1:slector}').removeClass($2);$0",
+    "prefix": "jqRemoveClass"
+  },
+  "jqShow": {
+    "body": "\\$j('#${1:slector}').show();$0",
+    "prefix": "jqShow"
+  },
+  "jqThis": {
+    "body": "\\$j(this).($1);$0",
+    "prefix": "jqThis"
+  },
+  "jqVal": {
+    "body": "\\$j('#${1:slector}').val($2);$0",
+    "prefix": "jqVal"
+  },
+  "jsSetTimeout": {
+    "body": "setTimeout(function(){\n\t${1}\n}, 3000);$0",
+    "prefix": "jsSetTimeout"
+  },
+  "jslintIgnore": {
+    "body": "/* jshint ignore:start*/\n\t$1\n/* jshint ignore:end*/$0",
+    "prefix": "jslintIgnore"
+  },
+  "psAcPrim": {
+    "body": "<input type=\"hidden\" name=\"ac\" value=\"prim\" />$0",
+    "prefix": "psAcPrim"
+  },
+  "psAuthorizeXRFE": {
+    "body": "~[AuthorizeXFRE:${1:DC-.*}]$0",
+    "prefix": "psAuthorizeXRFE"
+  },
+  "psButtonRow": {
+    "body": "<div class=\"button-row\">\n\t\n</div>$0",
+    "prefix": "psButtonRow"
+  },
+  "psCurDate": {
+    "body": "~[short.date]$0",
+    "prefix": "psCurDate"
+  },
+  "psCurUserId": {
+    "body": "~[x:userid]$0",
+    "prefix": "psCurUserId"
+  },
+  "psCurUserName": {
+    "body": "~[x:username]$0",
+    "prefix": "psCurUserName"
+  },
+  "psDateWidget": {
+    "body": "<input type=\"text\" class=\"psDateWidget\"$0",
+    "prefix": "psDateWidget"
+  },
+  "psDialogDocked": {
+    "body": "<a class=\"dialogDivM dockedDialog button\" title=\"New Record\" href=\"#newRecord\">New Record</a>$0",
+    "prefix": "psDialogDocked"
+  },
+  "psDirectTableSelect": {
+    "body": "~[DirectTable.Select:${1:tableName};id:${2:idvalue}]$0",
+    "prefix": "psDirectTableSelect"
+  },
+  "psFeedbackAlert": {
+    "body": "<div class=\"feedback-alert\"></div>$0",
+    "prefix": "psFeedbackAlert"
+  },
+  "psFeedbackConfirm": {
+    "body": "<div class=\"feedback-confirm\"></div>$0",
+    "prefix": "psFeedbackConfirm"
+  },
+  "psFeedbackError": {
+    "body": "<div class=\"feedback-error\"></div>$0",
+    "prefix": "psFeedbackError"
+  },
+  "psFieldChildDelete": {
+    "body": "<input type=\"text\" name=\"DC-${1:coreTable}:${2:coreTableDcid}.${3:extensionName}.{4:ChildTableNAme}:${5:childTableId}\" />$0",
+    "prefix": "psFieldChildDelete"
+  },
+  "psFieldChildEdit": {
+    "body": "<input type=\"text\" name=\"CF-[${1:coreTable}:${2:coreTableDcid}.${3:extensionName}.{4:ChildTableNAme}:${5:childTableId}]${6:fieldName}\" />$0",
+    "prefix": "psFieldChildEdit"
+  },
+  "psFieldChildNew": {
+    "body": "<input type=\"text\" name=\"CF-[${1:coreTable}:${2:coreTableDcid}.${3:extensionName}.{4:ChildTableNAme}:-1]${5:fieldName}\" />$0",
+    "prefix": "psFieldChildNew"
+  },
+  "psFieldExtended": {
+    "body": "<input type=\"text\" name=\"[students.${1:extensionName}]${2:fieldName}\" value=\"\" />$0",
+    "prefix": "psFieldExtended"
+  },
+  "psFormAdmin": {
+    "body": "<form action=\"admin/changesrecorded.white.html\">\n\t$1\n\t<div class=\"button-row\">\n\t\t<input type=\"hidden\" name=\"ac\" value=\"prim\"/>\n\t\t~[submitbutton]\n\t</div>\n</form>$0",
+    "prefix": "psFormAdmin"
+  },
+  "psFormParent": {
+    "body": "<form action=\"\">\n\t$1\n\t<div class=\"button-row\">\n\t\t<input type=\"hidden\" name=\"ac\" value=\"autosendupdate\"/>\n\t\t~[submitbutton]\n\t</div>\n</form>$0",
+    "prefix": "psFormParent"
+  },
+  "psFormTch": {
+    "body": "<form action=\"\">\n\t$1\n\t<div class=\"button-row\">\n\t\t<input type=\"hidden\" name=\"ac\" value=\"webasmt\"/>\n\t\t~[submitbutton]\n\t</div>\n</form>$0",
+    "prefix": "psFormTch"
+  },
+  "psIfDistrict": {
+    "body": "~[if.district.office][/if]$0",
+    "prefix": "psIfDistrict"
+  },
+  "psIfGuardian": {
+    "body": "~[if.isguardian][/if]$0",
+    "prefix": "psIfGuardian"
+  },
+  "psIfSchool": {
+    "body": "~[if.is.a.school][/if]$0",
+    "prefix": "psIfSchool"
+  },
+  "psIfStudent": {
+    "body": "~[if.isstudent][/if]$0",
+    "prefix": "psIfStudent"
+  },
+  "psInput": {
+    "body": "<input type=\"text\" name=\"[]\" value=\"\"/>$0",
+    "prefix": "psInput"
+  },
+  "psInputHidden": {
+    "body": "<input type=\"hidden\" name=\"[]\" value=\"\" />$0",
+    "prefix": "psInputHidden"
+  },
+  "psJsfieldparam": {
+    "body": "~(JSFieldParam;[01]fieldName)$0",
+    "prefix": "psJsfieldparam"
+  },
+  "psPref": {
+    "body": "~[displaypref:${1:prefname}]$0",
+    "prefix": "psPref"
+  },
+  "psPrefSchool": {
+    "body": "~[prefschool:${1:prefname}]$0",
+    "prefix": "psPrefSchool"
+  },
+  "psPrefUser": {
+    "body": "~[displaypref:${1:prefname}-U~[x:userid]]$0",
+    "prefix": "psPrefUser"
+  },
+  "psRepeatForEachStudent": {
+    "body": "~[studentlist2]\n~[RepeatForEach:Students]\n\t${1:rowTemplate}\n[/RepeatForEach:Students]$0",
+    "prefix": "psRepeatForEachStudent"
+  },
+  "psSchool": {
+    "body": "~(curschoolid)$0",
+    "prefix": "psSchool"
+  },
+  "psSchoolName": {
+    "body": "~(schoolname)$0",
+    "prefix": "psSchoolName"
+  },
+  "psStudent": {
+    "body": "~(curstudid)$0",
+    "prefix": "psStudent"
+  },
+  "psStudentCount": {
+    "body": "~[x:studsinset]$0",
+    "prefix": "psStudentCount"
+  },
+  "psTableFilter": {
+    "body": "<table class=\"linkDescList\" data-pstablefilter=\"\">\n\t<tr>\n\t\t<th>$1</th>\n\t</tr>\n\t<tr>\n\t\t<td></td>\n\t</tr>\n</table>$0",
+    "prefix": "psTableFilter"
+  },
+  "psTableGrid": {
+    "body": "<table class=\"grid\">\n\t<tr>\n\t\t<th>$1</th>\n\t</tr>\n\t<tr>\n\t\t<td></td>\n\t</tr>\n</table>$0",
+    "prefix": "psTableGrid"
+  },
+  "psTableLinkDesc": {
+    "body": "<table class=\"linkDescList\">\n\t<tr>\n\t\t<th>$1</th>\n\t</tr>\n\t<tr>\n\t\t<td></td>\n\t</tr>\n</table>$0",
+    "prefix": "psTableLinkDesc"
+  },
+  "psTimeEntry": {
+    "body": "<script type=\"text/javascript\" src=\"/scripts/timeentry_widget.js\"></script>\n<input type=\"text\" name=\"\" class=\"timeEntry\" />$0",
+    "prefix": "psTimeEntry"
+  },
+  "psVersion": {
+    "body": "~[x:version]$0",
+    "prefix": "psVersion"
+  },
+  "psYearid": {
+    "body": "~(curyearid)$0",
+    "prefix": "psYearid"
+  },
+  "psYearname": {
+    "body": "~(yearname)$0",
+    "prefix": "psYearname"
+  },
+  "psgpv": {
+    "body": "~[duplicate;6;xx;count]\n\t${1:rowTemplate}\n[/duplicate]$0",
+    "prefix": "psgpv"
+  },
+  "psif": {
+    "body": "~[if.~[gpv:${1:param}]=][else][/if]$0",
+    "prefix": "psif"
+  },
+  "psinsertFile": {
+    "body": "~[x:insertfile;${1:filename}.${2:html}]$0",
+    "prefix": "psinsertFile"
+  },
+  "pstlist": {
+    "body": "~[tlist_sql;\n\t${1:query}\n;]\n\t${2:rowTemplate}\n[/tlist_sql]$0",
+    "prefix": "pstlist"
+  },
+  "pswc": {
+    "body": "~[wc:${1:filename}]$0",
+    "prefix": "pswc"
+  }
+}

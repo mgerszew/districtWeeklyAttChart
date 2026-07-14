@@ -1,0 +1,13 @@
+<!-- /admin/{plugin}/templates/navigation.html - External template for Hybrid pattern -->
+<!-- Referenced via: ng-include="'/admin/{plugin}/templates/navigation.html'" -->
+
+<nav class="plugin-navigation">
+    <ul class="nav-list">
+        <li ng-repeat="item in navItems" class="nav-item">
+            <a ng-href="{{item.url}}" class="nav-link">
+                <span class="nav-name">{{item.name}}</span>
+                <span ng-if="item.category" class="nav-category">{{item.category}}</span>
+            </a>
+        </li>
+    </ul>
+</nav>

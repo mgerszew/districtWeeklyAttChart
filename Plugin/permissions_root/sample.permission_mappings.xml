@@ -1,0 +1,30 @@
+<permission_mappings>
+  <permission name='/admin/students/standardGrades.html'>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.standardscore.sbgassignscore</implies>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.sections.calcmethod</implies>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.standardscore.sbgassignscoretrend</implies>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.standardgradesection.sbgscoreterms</implies>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.district.settings</implies>
+  </permission>
+  <permission name='/teachers/standardGrades.html'>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.standardscore.sbgassignscore</implies>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.sections.calcmethod</implies>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.standardscore.sbgassignscoretrend</implies>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.standardgradesection.sbgscoreterms</implies>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.district.settings</implies>
+  </permission>
+  <permission name='/guardian/standardGrades.html'>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.standardscore.sbgassignscore</implies>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.sections.calcmethod</implies>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.standardscore.sbgassignscoretrend</implies>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.standardgradesection.sbgscoreterms</implies>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.district.settings</implies>
+  </permission>
+  <permission name='/student/home.html'>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.standardscore.sbgassignscore</implies>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.sections.calcmethod</implies>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.standardscore.sbgassignscoretrend</implies>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.standardgradesection.sbgscoreterms</implies>
+   <implies allow="post">/ws/schema/query/org.bps.sbgassign.district.settings</implies>
+  </permission>
+</permission_mappings>

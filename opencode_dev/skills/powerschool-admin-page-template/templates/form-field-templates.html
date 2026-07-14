@@ -1,0 +1,247 @@
+<!-- Form Field Snippets for PowerSchool Admin Student Pages -->
+<!-- Copy into <div class="box-round"> before <div class="button-row"> -->
+
+<!-- ============================================
+     BASIC TEXT INPUT
+     ============================================ -->
+<div class="form-row">
+    <label for="field_name">Field Label:</label>
+    <input type="text" name="field_name" id="field_name" value="~(field_name)" maxlength="100" size="40">
+</div>
+
+<!-- ============================================
+     REQUIRED TEXT INPUT
+     ============================================ -->
+<div class="form-row">
+    <label for="required_field">Required Field <span class="required">*</span>:</label>
+    <input type="text" name="required_field" id="required_field" value="~(required_field)" maxlength="100" size="40" required>
+</div>
+
+<!-- ============================================
+     TEXTAREA
+     ============================================ -->
+<div class="form-row">
+    <label for="notes">Notes:</label>
+    <textarea name="notes" id="notes" rows="4" cols="60">~(notes)</textarea>
+</div>
+
+<!-- ============================================
+     SELECT DROPDOWN
+     ============================================ -->
+<div class="form-row">
+    <label for="status">Status:</label>
+    <select name="status" id="status">
+        <option value="">-- Select --</option>
+        <option value="Active" ~[if.~(status)=Active]selected[/if]>Active</option>
+        <option value="Inactive" ~[if.~(status)=Inactive]selected[/if]>Inactive</option>
+        <option value="Pending" ~[if.~(status)=Pending]selected[/if]>Pending</option>
+    </select>
+</div>
+
+<!-- ============================================
+     SELECT FROM QUERY (dynamic options)
+     ============================================ -->
+<div class="form-row">
+    <label for="school_id">School:</label>
+    <select name="school_id" id="school_id">
+        <option value="">-- Select School --</option>
+        ~[tlist_sql:schools]
+            SELECT school_number, name FROM schools WHERE status = 1 ORDER BY name
+        [/tlist_sql]
+        <option value="~(school_number)" ~[if.~(school_id)=~(school_number)]selected[/if]>~(name)</option>
+        ~[/tlist_sql]
+    </select>
+</div>
+
+<!-- ============================================
+     CHECKBOX (single)
+     ============================================ -->
+<div class="form-row">
+    <input type="checkbox" name="is_active" id="is_active" value="1" ~[if.~(is_active)=1]checked[/if]>
+    <label for="is_active">Active</label>
+</div>
+
+<!-- ============================================
+     CHECKBOX GROUP
+     ============================================ -->
+<div class="form-row">
+    <label>Options:</label>
+    <div class="checkbox-group">
+        <label><input type="checkbox" name="opt_a" value="1" ~[if.~(opt_a)=1]checked[/if]> Option A</label>
+        <label><input type="checkbox" name="opt_b" value="1" ~[if.~(opt_b)=1]checked[/if]> Option B</label>
+        <label><input type="checkbox" name="opt_c" value="1" ~[if.~(opt_c)=1]checked[/if]> Option C</label>
+    </div>
+</div>
+
+<!-- ============================================
+     RADIO BUTTONS
+     ============================================ -->
+<div class="form-row">
+    <label>Contact Type:</label>
+    <div class="radio-group">
+        <label><input type="radio" name="contact_type" value="Home" ~[if.~(contact_type)=Home]checked[/if]> Home</label>
+        <label><input type="radio" name="contact_type" value="Work" ~[if.~(contact_type)=Work]checked[/if]> Work</label>
+        <label><input type="radio" name="contact_type" value="Mobile" ~[if.~(contact_type)=Mobile]checked[/if]> Mobile</label>
+    </div>
+</div>
+
+<!-- ============================================
+     HIDDEN FIELD (for IDs, action codes)
+     ============================================ -->
+<input type="hidden" name="record_id" value="~(record_id)">
+<input type="hidden" name="ac" value="~[if.~(ac)]~(ac)[else]prim[/if]">
+
+<!-- ============================================
+     DATE INPUT (with datepicker)
+     ============================================ -->
+<div class="form-row">
+    <label for="contact_date">Date:</label>
+    <input type="text" name="contact_date" id="contact_date" value="~(contact_date)" class="date-picker" size="10" maxlength="10">
+</div>
+<script>
+$j(function() {
+    $j('.date-picker').datepicker({ dateFormat: 'mm/dd/yy' });
+});
+</script>
+
+<!-- ============================================
+     READONLY DISPLAY
+     ============================================ -->
+<div class="form-row">
+    <label>Created:</label>
+    <span class="readonly">~(created_date)</span>
+</div>
+
+<!-- ============================================
+     FILE UPLOAD
+     ============================================ -->
+<div class="form-row">
+    <label for="attachment">Attachment:</label>
+    <input type="file" name="attachment" id="attachment">
+    ~[if.~(attachment_name)]
+        <p>Current: <a href="/admin/students/download.pshtml?frn=~(studentfrn)&file=~(attachment_name)">~(attachment_name)</a></p>
+    [/if]
+</div>
+<!-- Note: Form must have enctype="multipart/form-data" for file upload -->
+
+<!-- ============================================
+     PASSWORD FIELD
+     ============================================ -->
+<div class="form-row">
+    <label for="password">Password:</label>
+    <input type="password" name="password" id="password" autocomplete="new-password">
+    <span class="help">Leave blank to keep current</span>
+</div>
+
+<!-- ============================================
+     NUMBER INPUT
+     ============================================ -->
+<div class="form-row">
+    <label for="priority">Priority:</label>
+    <input type="number" name="priority" id="priority" value="~(priority)" min="1" max="10" size="3">
+</div>
+
+<!-- ============================================
+     EMAIL INPUT
+     ============================================ -->
+<div class="form-row">
+    <label for="email">Email:</label>
+    <input type="email" name="email" id="email" value="~(email)" maxlength="100" size="40">
+</div>
+
+<!-- ============================================
+     PHONE INPUT
+     ============================================ -->
+<div class="form-row">
+    <label for="phone">Phone:</label>
+    <input type="tel" name="phone" id="phone" value="~(phone)" maxlength="20" size="20" placeholder="(555) 555-5555">
+</div>
+
+<!-- ============================================
+     TWO-COLUMN LAYOUT (side by side)
+     ============================================ -->
+<div class="form-row two-column">
+    <div class="field-half">
+        <label for="first_name">First Name:</label>
+        <input type="text" name="first_name" id="first_name" value="~(first_name)" maxlength="50" size="25">
+    </div>
+    <div class="field-half">
+        <label for="last_name">Last Name:</label>
+        <input type="text" name="last_name" id="last_name" value="~(last_name)" maxlength="50" size="25">
+    </div>
+</div>
+
+<!-- ============================================
+     LABEL/VALUE DISPLAY (for read-only views)
+     ============================================ -->
+<div class="form-row">
+    <label>Field Label:</label>
+    <span class="value">~(field_value)</span>
+</div>
+
+<!-- ============================================
+     SECTION DIVIDER
+     ============================================ -->
+<hr class="section-divider">
+<h3>Subsection Title</h3>
+
+<!-- ============================================
+     INSTRUCTIONAL TEXT
+     ============================================ -->
+<div class="form-row">
+    <div class="help-text">
+        <p>Instructional text for the user.</p>
+    </div>
+</div>
+
+<!-- ============================================
+     CONDITIONAL FIELDS (based on action)
+     ============================================ -->
+~[if.~(ac)=upd]
+    <input type="hidden" name="id" value="~(id)">
+    <div class="form-row">
+        <label>Created:</label>
+        <span class="readonly">~(created_date)</span>
+    </div>
+    <div class="form-row">
+        <label>Modified:</label>
+        <span class="readonly">~(modified_date)</span>
+    </div>
+[/if]
+
+~[if.~(ac)=prim]
+    <div class="form-row">
+        <label for="status">Status:</label>
+        <select name="status" id="status">
+            <option value="Active" selected>Active</option>
+            <option value="Inactive">Inactive</option>
+        </select>
+    </div>
+[/if]
+
+<!-- ============================================
+     TABLE GRID (for multiple records inline)
+     ============================================ -->
+<table class="grid inline-edit">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Value</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        ~[tlist_sql:items]
+            SELECT name, value, id FROM your_table WHERE studentid = ~(curstudid)
+        [/tlist_sql]
+        <tr class="~[if.odd]odd[else]even[/if]">
+            <td><input type="text" name="name_~(id)" value="~(name)"></td>
+            <td><input type="text" name="value_~(id)" value="~(value)"></td>
+            <td>
+                <input type="hidden" name="ids" value="~(id)">
+                <a href="#" class="delete-row" data-id="~(id)">Delete</a>
+            </td>
+        </tr>
+        ~[/tlist_sql]
+    </tbody>
+</table>

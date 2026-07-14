@@ -1,0 +1,130 @@
+<!--
+TemplateName:Admin Student Page - Student Attendance Analytics
+-->
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Student Attendance Analytics</title>
+	~[wc:commonscripts] 
+	<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+	<link href="/images/css/print.css" rel="stylesheet" media="print">
+	<script>
+		$j(function(){
+			$j('#date-range-form').on('submit', function(e){
+				e.preventDefault();
+				var startDate = $j('#start_date').val();
+				var endDate = $j('#end_date').val();
+				var studentFrn = '~(studentfrn)';
+				window.location.href = '/~[self.page]?frn=' + studentFrn + '&start_date=' + startDate + '&end_date=' + end_date;
+			});
+		});
+	</script>
+</head> 
+<body> 
+	~[wc:admin_header_frame_css]
+	<!-- breadcrumb start -->
+		<a href="/admin/home.html" target="_top">Start Page</a> > <a href="/admin/students/home.html?selectstudent=nosearch" target="_top">Student Selection</a> > Student Attendance Analytics
+	<!-- breadcrumb end -->
+~[wc:admin_navigation_frame_css]
+~[wc:title_student_begin_css]Student Attendance Analytics~[wc:title_student_end_css]
+<form action="/~[self.page]?frn=~(studentfrn)&changesSaved=true" method="POST" id="date-range-form">
+<!-- start of content area -->
+~[if.~(gpv.changesSaved)=true]<div class="feedback-confirm">~[text:psx.common.changes_recorded]</div>[/if]
+	<div class="box-round">
+		 <h2>Attendance Analytics</h2>
+		 <p>View and analyze attendance patterns for this student.</p>
+         
+         <!-- Date Range Filter -->
+         <div class="form-row">
+             <label for="start_date">Start Date:</label>
+             <input type="date" id="start_date" name="start_date" value="~(gpv.start_date)">
+             <label for="end_date">End Date:</label>
+             <input type="date" id="end_date" name="end_date" value="~(gpv.end_date)">
+             <input type="submit" value="Filter" class="btn btn-primary">
+         </div>
+         
+         <!-- Summary Statistics -->
+         <div class="summary-grid" style="margin-top: 20px;">
+             <div class="stat-box">
+                 <h3>Total Days</h3>
+                 <div class="stat-value">~(gpv.total_days)</div>
+             </div>
+             <div class="stat-box">
+                 <h3>Days Present</h3>
+                 <div class="stat-value">~(gpv.days_present)</div>
+             </div>
+             <div class="stat-box">
+                 <h3>Days Absent</h3>
+                 <div class="stat-value">~(gpv.days_absent)</div>
+             </div>
+             <div class="stat-box">
+                 <h3>Attendance Rate</h3>
+                 <div class="stat-value">~(gpv.attendance_rate)%</div>
+             </div>
+         </div>
+         
+         <!-- Attendance Detail Table -->
+         <h3 style="margin-top: 30px;">Daily Attendance Detail</h3>
+         <table class="grid" id="attendance-detail">
+             <thead>
+                 <tr>
+                     <th>Date</th>
+                     <th>Period</th>
+                     <th>Course</th>
+                     <th>Attendance Code</th>
+                     <th>Description</th>
+                     <th>Minutes</th>
+                 </tr>
+             </thead>
+             <tbody>
+                 ~(gpv.attendance_rows)
+             </tbody>
+         </table>
+         
+         <!-- Attendance by Code Summary -->
+         <h3 style="margin-top: 30px;">Absence Summary by Code</h3>
+         <table class="grid" id="attendance-summary">
+             <thead>
+                 <tr>
+                     <th>Attendance Code</th>
+                     <th>Description</th>
+                     <th>Count</th>
+                     <th>Percentage</th>
+                 </tr>
+             </thead>
+             <tbody>
+                 ~(gpv.summary_rows)
+             </tbody>
+         </table>
+
+         <div class="button-row">
+             <input type="hidden" name="ac" value="prim">
+             ~[submitbutton]
+             <input type="button" value="Export CSV" class="btn" onclick="exportToCSV()">
+             <input type="button" value="Print" class="btn" onclick="window.print()">
+         </div>
+	</div>
+</form>
+<!-- end of content area -->
+	~[wc:admin_footer_frame_css>
+	<script>
+		function exportToCSV() {
+			var table = document.getElementById('attendance-detail');
+			var csv = [];
+			for (var i = 0; i < table.rows.length; i++) {
+				var row = [], cols = table.rows[i].cells;
+				for (var j = 0; j < cols.length; j++) {
+					row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+				}
+				csv.push(row.join(','));
+			}
+			var blob = new Blob([csv.join('\n')], {type: 'text/csv'});
+			var url = window.URL.createObjectURL(blob);
+			var a = document.createElement('a');
+			a.href = url;
+			a.download = 'attendance_analytics_~(studentfrn).csv';
+			a.click();
+		}
+	</script>
+</body> 
+</html>
