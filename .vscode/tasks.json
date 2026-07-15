@@ -17,7 +17,7 @@
         {
             "label": "CPM Sync",
             "type": "shell",
-            "command": "python -m acme_cpmsync Plugin/WEB_ROOT --beep --verbose",
+            "command": "python -m acme_cpmsync --path Plugin/WEB_ROOT",
             "problemMatcher": [],
             "group": {
                 "kind": "none",
